@@ -34,39 +34,19 @@ class _MyAppState extends State<MyApp> {
       bool weightAvailable = Health.isDataTypeAvailable(HealthDataType.WEIGHT);
       print("is WEIGHT data type available?: $weightAvailable");
 
-      /// Specify the wished data types
-      List<HealthDataType> types = [
-//        HealthDataType.ACTIVE_ENERGY_BURNED,
-//        HealthDataType.BASAL_ENERGY_BURNED,
-//        HealthDataType.BLOOD_GLUCOSE,
-//        HealthDataType.BLOOD_OXYGEN,
-//        HealthDataType.BLOOD_PRESSURE_DIASTOLIC,
-//        HealthDataType.BLOOD_PRESSURE_SYSTOLIC,
-//        HealthDataType.BODY_FAT_PERCENTAGE,
-//        HealthDataType.BODY_MASS_INDEX,
-//        HealthDataType.HEART_RATE,
-//        HealthDataType.HEIGHT,
-//        HealthDataType.RESTING_HEART_RATE,
-        HealthDataType.STEPS,
-//        HealthDataType.WAIST_CIRCUMFERENCE,
-//        HealthDataType.WEIGHT
-      ];
+      /// Calls must be wrapped in a try catch block
+      try {
+        HealthDataType type = HealthDataType.STEPS;
+        List<HealthDataPoint> healthData =
+            await Health.getHealthDataFromType(startDate, endDate, type);
 
-      for (HealthDataType type in types) {
-        /// Calls must be wrapped in a try catch block
-        try {
-          /// Fetch new data
-          List<HealthDataPoint> healthData =
-          await Health.getHealthDataFromType(startDate, endDate, type);
+        /// Save all the new data points
+        _healthDataList.addAll(healthData);
 
-          /// Save all the new data points
-          _healthDataList.addAll(healthData);
-
-          /// Filter out duplicates based on their UUID
-          _healthDataList = Health.removeDuplicates(_healthDataList);
-        } catch (exception) {
-          print(exception.toString());
-        }
+        /// Filter out duplicates based on their UUID
+        _healthDataList = Health.removeDuplicates(_healthDataList);
+      } catch (exception) {
+        print(exception.toString());
       }
 
       /// Print the results
@@ -75,7 +55,7 @@ class _MyAppState extends State<MyApp> {
       /// Update the UI to display the results
       setState(() {
         _state =
-        _healthDataList.isEmpty ? AppState.NO_DATA : AppState.DATA_READY;
+            _healthDataList.isEmpty ? AppState.NO_DATA : AppState.DATA_READY;
       });
     } else {
       print('Not authorized');
@@ -132,10 +112,10 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Plugin example app'),
+            title: const Text('fetch health data'),
             actions: <Widget>[
               IconButton(
-                icon: Icon(Icons.file_download),
+                icon: Icon(Icons.update),
                 onPressed: () {
                   fetchData();
                 },
